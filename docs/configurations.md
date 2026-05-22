@@ -53,3 +53,10 @@ energy_stats_t = torch.tensor(energy_stats, dtype=torch.float32)
 ## Sanity checks
 
 A minimal validator is provided in `src/mixconfig/config_extractor.py::validate_configurations`; call it once at load time to catch shape and dtype mismatches before training.
+
+## `max_clusters` and the singleton endpoint
+
+`EnergyAwareSelector` allocates one `nn.Embedding(max_clusters, embed_dim)` table per configuration (see `src/mixconfig/embedder.py`). Cluster ids in any column of `configs` must therefore be strictly less than `max_clusters`. Two practical consequences:
+
+- For the shipped MNIST-70k artifact, the BlueRed front includes a singleton-endpoint configuration (k = 70000, every sample is its own cluster). Either drop it (`configs[:, :-1]`) before passing to the selector, or set `max_clusters=70000` (wasteful — one 70 000-row embedding table per configuration).
+- For your own configurations, size `max_clusters` to `int(configs.max()) + 1` and pass `n_configs = configs.shape[1]`. The reference demo at `notebooks/demo_mnist.ipynb` shows the pattern.
