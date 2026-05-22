@@ -16,9 +16,12 @@ The BlueRed front returned by the upstream extractor includes two **degenerate e
 
 ## How the artifact was produced
 
-`scripts/extract_mnist_artifacts.py` loads the BlueRed configurations from the upstream `bluered` cache, computes HOG features (9 orientations, 7×7 pixels per cell, 2×2 cells per block; matches the upstream demo notebook), and runs the same energy-statistics formulation as `src/mixconfig/energy.py::precompute_energy_statistics`. The H/h_a/h_r/delta_gamma values are therefore in the same feature space as the upstream clustering, not a feature-space proxy.
+`scripts/extract_mnist_artifacts.py` loads the BlueRed configurations from the upstream `bluered` cache, computes HOG features (9 orientations, 7×7 pixels per cell, 2×2 cells per block; matches the upstream demo notebook), and produces the four energy statistics:
 
-For configurations with more than 1 500 clusters (e.g., the singleton-endpoint of the BlueRed front), inter-centroid statistics are estimated by a uniform-random Monte Carlo subsample to keep memory bounded; the relative bias on the mean is well below 1%. `scripts/smoke_test.py` reruns the validation invariants asserted by `validate_configurations` plus an `EnergyAwareSelector` forward pass on a 1000-sample subset.
+- **`H`, `h_a`, `h_r`** follow the schema in `src/mixconfig/energy.py` (Shannon entropy of the partition; mean intra-cluster distance and mean inter-centroid distance in HOG feature space).
+- **`delta_gamma`** uses the paper definition: the width of the resolution band on the gamma axis, read from `bluered_gamma_rng[j, 1] - bluered_gamma_rng[j, 0]`. The singleton-endpoint configuration has an open-ended band (`gamma_rng[m-1, 1] = ∞`) capped at 2× the largest finite width so the model input stays bounded.
+
+For configurations with more than 1 500 clusters (e.g., the singleton-endpoint of the BlueRed front), inter-centroid statistics for `h_r` are estimated by a uniform-random Monte Carlo subsample to keep memory bounded; the relative bias on the mean is well below 1%. `scripts/smoke_test.py` reruns the validation invariants asserted by `validate_configurations` plus an `EnergyAwareSelector` forward pass on a 1000-sample subset.
 
 ## Substituting your own extractor
 

@@ -8,15 +8,18 @@ Inputs (read-only):
 Output:
     MixConfig/data/mnist_configs.npz with keys:
       - configs            [n, m] int64    cluster assignments from BlueRed front
-      - energy_stats       [m, 4] float32  [H, h_a, h_r, delta_gamma] computed from HOG features
+      - energy_stats       [m, 4] float32  [H, h_a, h_r, delta_gamma]
       - labels             [n]    int64    MNIST class labels (for downstream evaluation)
       - bluered_lambda     [m]    float64  BlueRed persistence (informational)
       - bluered_mu         [m]    float64  BlueRed steadiness (informational)
       - bluered_gamma_rng  [m, 2] float64  BlueRed resolution intervals (informational)
 
-The H/h_a/h_r/delta_gamma stats follow the schema in src/mixconfig/energy.py
-(precompute_energy_statistics), inlined here so the script can run inside the
-bluered uv env without importing MixConfig.
+H, h_a, h_r follow the schema in src/mixconfig/energy.py (Shannon entropy of
+the partition; mean intra-cluster distance and mean inter-centroid distance in
+HOG feature space). delta_gamma follows the paper definition: the width of the
+resolution band on the gamma axis, taken directly from bluered_gamma_rng. The
+singleton-endpoint configuration has an open-ended resolution band, capped here
+at 2x the largest finite band so the model input stays finite.
 
 Run:
     cd bluered && uv run --extra demo python ../MixConfig/scripts/extract_mnist_artifacts.py
@@ -78,9 +81,37 @@ def _inter_stats(centroids: np.ndarray, max_full: int = 1500, rng_seed: int = 0)
     return float(d.mean()), float(d.max())
 
 
-def compute_energy_stats(features: np.ndarray, configs: np.ndarray) -> np.ndarray:
-    """[H, h_a, h_r, delta_gamma] per configuration, matching energy.py:precompute_energy_statistics."""
+def _gamma_band_widths(gamma_rng: np.ndarray) -> np.ndarray:
+    """Resolution-band widths from BlueRed gamma intervals (paper-side delta_gamma).
+
+    The singleton-endpoint configuration has gamma_rng[m-1, 1] = inf. Replace
+    that infinity with 2x the largest finite width so the resulting energy_stats
+    column stays bounded for the model.
+    """
+    widths = gamma_rng[:, 1] - gamma_rng[:, 0]
+    finite_mask = np.isfinite(widths)
+    if finite_mask.all():
+        return widths
+    cap = 2.0 * widths[finite_mask].max() if finite_mask.any() else 1.0
+    return np.where(finite_mask, widths, cap)
+
+
+def compute_energy_stats(
+    features: np.ndarray,
+    configs: np.ndarray,
+    gamma_rng: np.ndarray,
+) -> np.ndarray:
+    """[H, h_a, h_r, delta_gamma] per configuration.
+
+    H, h_a, h_r are computed in feature space following src/mixconfig/energy.py.
+    delta_gamma is the gamma-axis band width from `gamma_rng` (paper definition).
+    """
     n_configs = configs.shape[1]
+    if gamma_rng.shape != (n_configs, 2):
+        raise ValueError(
+            f"gamma_rng shape {gamma_rng.shape} does not match configs columns {n_configs}"
+        )
+    delta_gamma_all = _gamma_band_widths(gamma_rng).astype(np.float32)
     out = np.zeros((n_configs, 4), dtype=np.float32)
 
     for j in range(n_configs):
@@ -101,15 +132,13 @@ def compute_energy_stats(features: np.ndarray, configs: np.ndarray) -> np.ndarra
         centroids = np.stack(centroids)
 
         h_a = float(np.mean(intra)) if intra else 0.0
-        h_r, max_inter = _inter_stats(centroids)
-        min_intra = float(np.min(intra)) if intra else 0.0
-        delta_gamma = max_inter - min_intra if (intra and max_inter > 0) else 0.0
-        out[j] = [H, h_a, h_r, delta_gamma]
+        h_r, _max_inter = _inter_stats(centroids)
+        out[j] = [H, h_a, h_r, float(delta_gamma_all[j])]
         n_clusters = len(np.unique(cfg))
         sampled = " (sampled 1500/{n})".format(n=n_clusters) if n_clusters > 1500 else ""
         print(
             f"  config[{j}] k={n_clusters} "
-            f"H={H:.3f} h_a={h_a:.3f} h_r={h_r:.3f} dg={delta_gamma:.3f}{sampled}"
+            f"H={H:.3f} h_a={h_a:.3f} h_r={h_r:.3f} dg={delta_gamma_all[j]:.4g}{sampled}"
         )
     return out
 
@@ -136,8 +165,8 @@ def main() -> None:
     hog_features = _timed("hog", compute_hog_features, X)
     print(f"  hog={hog_features.shape}")
 
-    print("Computing energy statistics on HOG feature space:")
-    energy_stats = compute_energy_stats(hog_features, cid)
+    print("Computing energy statistics (H/h_a/h_r from HOG features; delta_gamma from bluered_gamma_rng):")
+    energy_stats = compute_energy_stats(hog_features, cid, cache["gamma_rng"])
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(

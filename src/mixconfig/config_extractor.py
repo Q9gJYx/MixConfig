@@ -16,12 +16,17 @@ import numpy as np
 def validate_configurations(
     configs: np.ndarray,
     energy_stats: np.ndarray,
-) -> None:
+) -> int:
     """
-    Sanity-check pre-extracted configurations and energy statistics.
+    Sanity-check pre-extracted configurations and energy statistics, and return
+    the maximum cluster id observed so the caller can size
+    ``EnergyAwareSelector.max_clusters`` accordingly.
 
-    Raises ValueError on shape or dtype mismatches, with a message that
-    points the caller to docs/configurations.md.
+    Raises ValueError on shape, dtype, or cluster-id-range violations with a
+    message that points the caller to docs/configurations.md.
+
+    Returns:
+        int: ``int(configs.max())`` - useful for sizing ``max_clusters``.
     """
     if configs.ndim != 2:
         raise ValueError(
@@ -31,6 +36,13 @@ def validate_configurations(
     if not np.issubdtype(configs.dtype, np.integer):
         raise ValueError(
             f"configs must be integer dtype, got {configs.dtype}. "
+            "See docs/configurations.md."
+        )
+    if configs.size == 0:
+        raise ValueError("configs is empty; expected at least one sample. See docs/configurations.md.")
+    if (configs < 0).any():
+        raise ValueError(
+            "configs contains negative cluster ids; cluster ids must be in [0, max_clusters). "
             "See docs/configurations.md."
         )
     if energy_stats.ndim != 2 or energy_stats.shape[1] != 4:
@@ -48,6 +60,7 @@ def validate_configurations(
             f"energy_stats rows ({energy_stats.shape[0]}) must equal "
             f"configs columns ({configs.shape[1]}). See docs/configurations.md."
         )
+    return int(configs.max())
 
 
 class ConfigExtractor:

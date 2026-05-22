@@ -20,9 +20,13 @@ The four scalars per configuration are produced by the Parallel-DT algorithm and
 | Symbol | Meaning |
 |---|---|
 | `H` | Entropy of the partition |
-| `h_a` | Attractive (within-cluster) graph energy |
-| `h_r` | Repulsive (between-cluster) graph energy |
-| `delta_gamma` | Width of the resolution band over which this partition is structurally stable |
+| `h_a` | Attractive (within-cluster) energy in feature space — mean intra-cluster distance |
+| `h_r` | Repulsive (between-cluster) energy in feature space — mean inter-centroid distance |
+| `delta_gamma` | Width of the resolution band on the gamma axis over which the partition is structurally stable |
+
+For configurations extracted by Parallel-DT / BlueRed, `delta_gamma` is obtained directly from the upstream `gamma_rng` metadata (`gamma_rng[j, 1] - gamma_rng[j, 0]`). For configurations from other multi-resolution clustering routines, supply whatever band-width-like scalar the routine produces, or fall back to 1.0 uniformly.
+
+Note: `src/mixconfig/energy.py::EnergyStatistics` falls back to a feature-space energy gap (`max_inter - min_intra`) when no precomputed `energy_stats` are supplied to `EnergyAwareSelector`. The shipped MNIST artifact uses the paper-spec gamma-axis width; the runtime fallback is a generalizable substitute for cases where gamma metadata is unavailable.
 
 If you supply your own configurations from a different multi-resolution clustering routine, you must provide all four scalars. Reasonable substitutes:
 
