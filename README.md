@@ -3,6 +3,7 @@
 [![ICML 2026](https://img.shields.io/badge/ICML-2026-1d4ed8.svg)](https://icml.cc/virtual/2026/poster/63010)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.19248-b31b1b.svg)](https://arxiv.org/abs/2510.19248)
 [![OpenReview](https://img.shields.io/badge/OpenReview-aw6alulxr8-8c1b13.svg)](https://openreview.net/forum?id=aw6alulxr8)
+[![DOI](https://zenodo.org/badge/983789519.svg)](https://doi.org/10.5281/zenodo.20342472)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org)
@@ -133,6 +134,7 @@ If you use MixConfig in your research, please cite:
   author    = {Wang, Juntang and Wu, Hao and Wang, Yihan and Zou, Dongmian and Xu, Shixin},
   booktitle = {Proceedings of the 43rd International Conference on Machine Learning ({ICML})},
   year      = {2026},
+  doi       = {10.5281/zenodo.20342472},
   note      = {arXiv:2510.19248}
 }
 ```

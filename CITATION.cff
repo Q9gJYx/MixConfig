@@ -3,6 +3,7 @@ message: "If you use MixConfig in your research, please cite the ICML 2026 paper
 title: "MixConfig: Mixing Configurations for Downstream Prediction"
 type: software
 license: MIT
+doi: 10.5281/zenodo.20342472
 repository-code: "https://github.com/Q9gJYx/MixConfig"
 url: "https://openreview.net/forum?id=aw6alulxr8"
 abstract: >-
