@@ -1,17 +1,11 @@
+"""MixConfig: Mixing Configurations for Downstream Prediction (ICML 2026).
+
+This top-level package re-exports the core MixConfig modules so
+``from src import *`` works without users having to know the submodule layout.
+Importing this package does not load PyTorch Lightning or plotting
+dependencies; the submodules pull them in only when actually used.
 """
-ML4DSMZ - Repo associated with the paper "GASNN" private package.
-"""
 
-from .utils import print_environment_info
-print_environment_info()
+from . import mixconfig
 
-modules = [
-    'neighbours',
-    'models',
-    'utils',
-    'helper',
-]
-
-__all__ = [
-    # TEMP_NULL
-] + modules
+__all__ = ["mixconfig"]

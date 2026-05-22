@@ -1,141 +1,144 @@
 # MixConfig: Mixing Configurations for Downstream Prediction
 
-Official implementation for the paper "Mixing Configurations for Downstream Prediction".
+[![ICML 2026](https://img.shields.io/badge/ICML-2026-1d4ed8.svg)](https://icml.cc/virtual/2026/poster/63010)
+[![arXiv](https://img.shields.io/badge/arXiv-2510.19248-b31b1b.svg)](https://arxiv.org/abs/2510.19248)
+[![OpenReview](https://img.shields.io/badge/OpenReview-aw6alulxr8-8c1b13.svg)](https://openreview.net/forum?id=aw6alulxr8)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org)
 
-## Abstract
+Official implementation of the ICML 2026 paper **"Mixing Configurations for Downstream Prediction"** by Juntang Wang, Hao Wu, Yihan Wang, Dongmian Zou, and Shixin Xu (Zu Chongzhi Center, Duke Kunshan University). Equal contribution: Wang, Wu, Wang. Corresponding author: Shixin Xu (`shixin.xu@dukekunshan.edu.cn`).
 
-We propose MixConfig, a framework for learning sample-specific mixtures of graph-based configurations to improve downstream prediction tasks. Given a dataset, MixConfig extracts multiple configurations via k-NN graph construction and Parallel-DT decomposition, then learns to adaptively weight these configurations for each sample using an Energy-Aware Selector. The selector leverages sample context, cluster assignment embeddings, and energy statistics to produce optimal configuration weights, yielding a mixed representation that captures multi-scale structural information. We demonstrate state-of-the-art performance across tabular, vision, molecular, and text benchmarks.
+> Clustering-based features are widely used in machine learning, but most methods must choose a resolution: a choice that is global, fixed, and ad hoc. Recent work shows that varying the resolution parameter produces only a finite set of structurally stable partitions, known as configurations. Based on this, we introduce Configuration-Mixed Prediction (CMP), a setting where models learn to adaptively weight these configurations per sample for downstream prediction. We propose **MixConfig**, a plug-and-play feature augmentation module that extracts configurations from any frozen embedding and learns energy-aware mixing weights via a novel selector that jointly reasons about sample context, cluster assignments, and stability statistics. Experiments across tabular, molecular, vision, and text domains demonstrate consistent improvements over single-resolution and static baselines across diverse predictor architectures, with gains particularly pronounced in low-data regimes.
 
-## Method Overview
+## 📰 News
 
-MixConfig consists of two main components:
+- **2026-05** Accepted to ICML 2026 (Seoul, July 6 to 11). 🎉
+- **2025-10** Preprint released on arXiv ([2510.19248](https://arxiv.org/abs/2510.19248)).
 
-1. **Configuration Extraction**: Given input data X, we construct a k-NN graph and apply Parallel-DT to obtain multiple configurations (cluster assignments) at different resolutions. The Parallel-DT extraction code is not included in this release; a Python implementation will be provided later.
+## 📌 Method
 
-2. **Energy-Aware Selector**: For each sample x, the selector computes:
-   - Sample context: h = MLP_enc(x)
-   - Cluster embeddings: c_i = Embed_i(omega_i(x))
-   - Energy statistics: e_i = [H_i, h_a^(i), h_r^(i), delta_gamma_i]
-   - Compatibility scores: s_i = MLP_score([h; c_i; e_i])
-   - Configuration weights: w_i(x) = softmax(s_i)
-   - Mixed representation: z(x) = sum_i w_i(x) * c_i
+Configurations are the finite, structurally stable partitions discovered by Parallel-DT on a k-NN graph; the Energy-Aware Selector learns per-sample mixing weights over them from sample context, cluster-assignment embeddings, and four stability statistics `[H, h_a, h_r, Δγ]`. Full definitions are in the [paper](https://icml.cc/virtual/2026/poster/63010); the public interface lives in [`src/mixconfig/`](src/mixconfig/).
 
-## Installation
+## 📦 Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/anonymous/mixconfig.git
-cd mixconfig
+git clone https://github.com/Q9gJYx/MixConfig.git
+cd MixConfig
 
-# Create conda environment
+# Conda environment
 conda env create -f environment.yml
 conda activate mixconfig
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 ```python
-from src.mixconfig import EnergyAwareSelector
-import numpy as np
-import torch
+import numpy as np, torch
+from src.mixconfig import EnergyAwareSelector, validate_configurations
 
-# Initialize the Energy-Aware Selector
+bundle = np.load("data/mnist_configs.npz")
+configs, energy_stats = bundle["configs"][:, :-1], bundle["energy_stats"][:-1]  # drop singleton endpoint
+max_id = validate_configurations(configs, energy_stats)
+
 selector = EnergyAwareSelector(
-    input_dim=X_train.shape[1],
-    n_configs=8,
-    context_dim=64,
-    cluster_embed_dim=32
+    input_dim=X.shape[1], n_configs=configs.shape[1], max_clusters=max_id + 1,
 )
-
-# Load external configuration assignments and energy statistics
-# configs: [n_samples, n_configs] integer assignments
-# energy_stats: [n_configs, 4] with [H, h_a, h_r, delta_gamma]
-configs = np.load("configs.npy")
-energy_stats = np.load("energy_stats.npy")
-energy_stats_t = torch.tensor(energy_stats, dtype=torch.float32)
-
-# Use mixed representations for downstream prediction
-z = selector.get_mixed_representation(X_train, configs, energy_stats_t)
+z = selector.get_mixed_representation(
+    torch.tensor(X), torch.tensor(configs, dtype=torch.long),
+    torch.tensor(energy_stats, dtype=torch.float32),
+)
 ```
 
-## Reproducing Paper Results
+The complete end-to-end demo (load, train, compare to single-config and uniform-mix baselines) lives in [`notebooks/demo_mnist.ipynb`](notebooks/demo_mnist.ipynb) — click to run on Colab:
 
-Note: configuration extraction is not included in this release. To reproduce MixConfig variants, you must supply extracted configurations and energy statistics. Base and +Config baselines can be run without the extractor.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Q9gJYx/MixConfig/blob/main/notebooks/demo_mnist.ipynb)
 
-### Tabular (OpenML-CC18)
+See [`docs/configurations.md`](docs/configurations.md) for the file-format contract if you want to plug in your own multi-resolution clustering routine.
+
+## 📊 Results
+
+MixConfig improves downstream prediction across four modalities relative to single-resolution and static-mixing baselines. Headline benchmarks:
+
+| Domain | Datasets | Predictors evaluated |
+|---|---|---|
+| Tabular | OpenML-CC18 (18 tasks) | MLP, TabPFN, FT-Transformer, XGBoost, RF |
+| Vision | CIFAR-100, ImageNet-1K | Linear probe on frozen CLIP embeddings |
+| Molecular | MolHIV, BBBP, BACE, QM9 | GNN, MLP on Morgan + GIN features |
+| Text | SST-2, AG News | Linear probe on BERT, RoBERTa |
+
+Gains are most pronounced in low-data regimes; see `experiments/run_lowdata.py` for the BBBP 5-fold CV protocol. Full numerical results and ablations are in the camera-ready paper ([ICML poster page](https://icml.cc/virtual/2026/poster/63010), [OpenReview](https://openreview.net/forum?id=aw6alulxr8), Tables 1 to 4).
+
+## 🔁 Reproducing Paper Results
+
+Every benchmark uses the same pattern (`--mode base` swaps in the single-resolution baseline; `--mode +config` adds MixConfig):
 
 ```bash
-python experiments/run_tabular.py --dataset openml-cc18 --config configs/datasets/tabular.yaml --mode base
+python experiments/run_<modality>.py --dataset <name> --config experiments/configs/datasets/<modality>.yaml --mode +config
 ```
 
-### Vision (CIFAR-100, ImageNet-1K)
+| Modality | Script | Datasets |
+|---|---|---|
+| Tabular | `run_tabular.py` | `openml-cc18` |
+| Vision | `run_vision.py` | `cifar100`, `imagenet1k` |
+| Molecular | `run_molecular.py` | `molhiv`, `bbbp`, `bace` |
+| Text | `run_text.py` | `sst2`, `ag_news` |
+| Low-data + ablation | `run_lowdata.py`, `run_ablation.py` | `bbbp` |
 
-```bash
-python experiments/run_vision.py --dataset cifar100 --config configs/datasets/vision.yaml --mode base
-python experiments/run_vision.py --dataset imagenet1k --config configs/datasets/vision.yaml --mode base
-```
-
-### Molecular (MolHIV, BBBP, BACE)
-
-```bash
-python experiments/run_molecular.py --dataset molhiv --config configs/datasets/molecular.yaml --mode base
-python experiments/run_molecular.py --dataset bbbp --config configs/datasets/molecular.yaml --mode base
-python experiments/run_molecular.py --dataset bace --config configs/datasets/molecular.yaml --mode base
-```
-
-### Text (SST-2, AG News)
-
-```bash
-python experiments/run_text.py --dataset sst2 --config configs/datasets/text.yaml --mode base
-python experiments/run_text.py --dataset ag_news --config configs/datasets/text.yaml --mode base
-```
-
-### Low-data and ablation scripts
-
-```bash
-python experiments/run_lowdata.py --dataset bbbp --mode base
-python experiments/run_ablation.py --dataset bbbp --ablation full
-```
-
-## Project Structure
+## 🧩 Repository Structure
 
 ```
-mixconfig/
+MixConfig/
 ├── src/
-│   ├── mixconfig/           # Core MixConfig implementation
-│   │   ├── selector.py      # Energy-Aware Selector
-│   │   ├── encoder.py       # Sample context encoder
-│   │   ├── embedder.py      # Cluster assignment embedder
-│   │   ├── energy.py        # Energy statistics computation
-│   │   └── config_extractor.py  # Configuration extraction
-│   ├── datasets/            # Dataset loaders
-│   │   ├── tabular.py       # OpenML-CC18
-│   │   ├── vision.py        # CIFAR-100, ImageNet-1K
-│   │   ├── molecular.py     # MolHIV, BBBP, BACE
-│   │   └── text.py          # SST-2, AG News
-│   ├── predictors/          # Downstream predictors
-│   │   ├── neural.py        # MLP, TabPFN, FT-Transformer
-│   │   └── classical.py     # XGBoost, RF, Linear
-│   ├── models.py            # Model definitions
-│   ├── utils.py             # Utility functions
-│   └── visuals.py           # Visualization utilities
-├── experiments/             # Experiment scripts
-│   ├── configs/             # Configuration files
-│   ├── run_ablation.py
-│   ├── run_lowdata.py
-│   ├── run_tabular.py
-│   ├── run_vision.py
-│   ├── run_molecular.py
-│   └── run_text.py
-├── environment.yml          # Conda environment
+│   ├── mixconfig/            # Core MixConfig implementation
+│   │   ├── selector.py       # Energy-Aware Selector
+│   │   ├── encoder.py        # Sample context encoder
+│   │   ├── embedder.py       # Cluster assignment embedder
+│   │   ├── energy.py         # Energy statistics computation
+│   │   └── config_extractor.py  # Interface + validator (extractor backend: docs/dependencies.md)
+│   ├── datasets/             # Tabular / vision / molecular / text loaders
+│   ├── predictors/           # Neural and classical downstream heads
+│   ├── models.py             # Model definitions
+│   ├── utils.py              # Utilities
+│   └── visuals.py            # Visualization
+├── experiments/              # Reproducibility scripts and configs
+├── data/                     # Pre-extracted configurations + energy stats
+├── docs/                     # Dependency status, interface contracts
+├── CITATION.cff              # Machine-readable citation metadata
+├── ROADMAP.md                # Planned releases
+├── environment.yml           # Conda environment
+├── LICENSE                   # MIT
 └── README.md
 ```
 
-## Notes on availability
+## 🔗 Dependencies and Attribution
 
-- Configuration extraction (Parallel-DT) is not included in this release; a Python implementation will be provided later.
-- The paper includes QM9 results; QM9 pipelines will be released alongside the extractor.
+Configuration extraction uses the **Parallel-DT algorithm** with the **BlueRed front** of [Liu, Floros, Pitsianis, and Sun (HPEC 2021)](https://doi.org/10.1109/HPEC49654.2021.9622834) and [Pitsianis, Floros, Liu, and Sun (HPEC 2023)](https://doi.org/10.1109/HPEC58863.2023.10363552). An updated reference implementation is under journal review by the upstream group. To support end-to-end reproduction without the extractor, pre-extracted configurations and energy statistics for MNIST-70k (HOG feature space) are released at `data/mnist_configs.npz`; an interface contract for substituting your own multi-resolution clustering routine is documented in `docs/configurations.md`. See `docs/dependencies.md` for full status of the extractor code.
 
-## License
+## 🗺️ Roadmap
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Headlines: public release of our Python port of Parallel-DT / BlueRed (pending the upstream journal version), QM9 pipeline, and larger benchmark coverage. Full plan in [ROADMAP.md](ROADMAP.md).
+
+## 🙏 Acknowledgments
+
+We thank Tiancheng Liu, Dimitris Floros, Nikos Pitsianis, and Xiaobai Sun (Duke University) for developing the Parallel-DT and BlueRed algorithms that underpin our configuration extraction. All experiments use publicly available datasets under their respective licenses: OpenML-CC18, CIFAR-100, ImageNet-1K, OGBG-MolHIV, MoleculeNet (BBBP, BACE, QM9), GLUE (SST-2), and AG News.
+
+## 📚 Citation
+
+If you use MixConfig in your research, please cite:
+
+```bibtex
+@inproceedings{wang2026mixing,
+  title     = {Mixing Configurations for Downstream Prediction},
+  author    = {Wang, Juntang and Wu, Hao and Wang, Yihan and Zou, Dongmian and Xu, Shixin},
+  booktitle = {Proceedings of the 43rd International Conference on Machine Learning ({ICML})},
+  year      = {2026},
+  note      = {arXiv:2510.19248}
+}
+```
+
+A machine-readable [CITATION.cff](CITATION.cff) is also provided, which GitHub renders into a "Cite this repository" button on the project page.
+
+## 📝 License
+
+Released under the MIT License. See [LICENSE](LICENSE) for details.

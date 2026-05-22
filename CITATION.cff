@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use MixConfig in your research, please cite the ICML 2026 paper below."
+title: "MixConfig: Mixing Configurations for Downstream Prediction"
+type: software
+license: MIT
+repository-code: "https://github.com/Q9gJYx/MixConfig"
+url: "https://openreview.net/forum?id=aw6alulxr8"
+abstract: >-
+  MixConfig is a plug-and-play feature augmentation module that extracts
+  structurally stable clustering configurations from a frozen embedding and
+  learns energy-aware mixing weights per sample for downstream prediction.
+keywords:
+  - multi-resolution clustering
+  - configuration mixing
+  - graph-based features
+  - feature augmentation
+  - low-data learning
+authors:
+  - family-names: Wang
+    given-names: Juntang
+    affiliation: "Zu Chongzhi Center, Duke Kunshan University"
+  - family-names: Wu
+    given-names: Hao
+    affiliation: "Zu Chongzhi Center, Duke Kunshan University"
+  - family-names: Wang
+    given-names: Yihan
+    affiliation: "Zu Chongzhi Center, Duke Kunshan University"
+  - family-names: Zou
+    given-names: Dongmian
+    affiliation: "Zu Chongzhi Center, Duke Kunshan University"
+  - family-names: Xu
+    given-names: Shixin
+    affiliation: "Zu Chongzhi Center, Duke Kunshan University"
+    email: "shixin.xu@dukekunshan.edu.cn"
+preferred-citation:
+  type: conference-paper
+  title: "Mixing Configurations for Downstream Prediction"
+  year: 2026
+  collection-title: "Proceedings of the 43rd International Conference on Machine Learning"
+  conference:
+    name: "International Conference on Machine Learning (ICML)"
+    city: "Seoul"
+    country: "KR"
+  authors:
+    - family-names: Wang
+      given-names: Juntang
+    - family-names: Wu
+      given-names: Hao
+    - family-names: Wang
+      given-names: Yihan
+    - family-names: Zou
+      given-names: Dongmian
+    - family-names: Xu
+      given-names: Shixin
+  notes: "arXiv:2510.19248"

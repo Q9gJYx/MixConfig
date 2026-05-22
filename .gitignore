@@ -25,12 +25,20 @@ venv/
 env/
 
 # Data and outputs
-data/
+# data/ is for shipped pre-extracted artifacts only; list each one explicitly so
+# transient extraction outputs never auto-track.
+data/*
+!data/.gitkeep
+!data/README.md
+!data/mnist_configs.npz
 logs/
 results/
 outputs/
 checkpoints/
 wandb/
+
+# Agent scratch
+.claude/
 
 # Model artifacts
 *.pt

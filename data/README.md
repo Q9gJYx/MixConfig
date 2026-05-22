@@ -1,0 +1,21 @@
+# Data Artifacts
+
+This directory is reserved for **pre-extracted configurations and energy statistics** that let MixConfig run end-to-end without the upstream configuration extractor. See [docs/configurations.md](../docs/configurations.md) for the file-format contract and [docs/dependencies.md](../docs/dependencies.md) for why the extractor code is not in this repository.
+
+## Contents
+
+| File | Dataset | Shape (`configs` / `energy_stats`) | Source | Status |
+|---|---|---|---|---|
+| `mnist_configs.npz` | MNIST-70k with HOG features | `[70000, 9]` int64 / `[9, 4]` float32 | Authors' Python port of Parallel-DT / BlueRed (`Q9gJYx/bluered`) + `scripts/extract_mnist_artifacts.py` | shipped with v1.0.0 |
+
+The MNIST file additionally carries `labels` (MNIST class targets) and the BlueRed-specific metadata `bluered_lambda` / `bluered_mu` / `bluered_gamma_rng` for inspection; the MixConfig selector consumes only `configs` and `energy_stats`. Additional benchmark artifacts (OpenML-CC18, BBBP, SST-2) are tracked in [ROADMAP.md](../ROADMAP.md).
+
+## Using the artifact with EnergyAwareSelector
+
+The BlueRed front returned by the upstream extractor includes two **degenerate endpoints**: the trivial one-cluster partition (`configs[:, 0]`, k=1) and the singleton partition (`configs[:, -1]`, k=70000, every sample its own cluster). Both are structurally stable by definition, but the singleton endpoint exceeds `EnergyAwareSelector.max_clusters` for any reasonable setting. Drop it before training: `configs = configs[:, :-1]`. The reference demo at `notebooks/demo_mnist.ipynb` shows the pattern. See `docs/configurations.md` for the `max_clusters` semantics.
+
+## Reproducing or substituting
+
+`scripts/extract_mnist_artifacts.py` regenerates this file from the upstream `bluered` cache; the script's module docstring records the exact preprocessing (HOG features, gamma-band-width `delta_gamma`, Monte Carlo `h_r` for the singleton endpoint). `scripts/smoke_test.py` re-verifies the artifact via `validate_configurations` plus an `EnergyAwareSelector` forward pass.
+
+To use your own multi-resolution clustering instead, follow the shape and dtype contract in [`docs/configurations.md`](../docs/configurations.md).
