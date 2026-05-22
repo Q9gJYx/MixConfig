@@ -8,7 +8,7 @@ from .selector import EnergyAwareSelector
 from .encoder import SampleContextEncoder
 from .embedder import ClusterAssignmentEmbedder
 from .energy import EnergyStatistics
-from .config_extractor import ConfigExtractor
+from .config_extractor import ConfigExtractor, validate_configurations
 
 __all__ = [
     "EnergyAwareSelector",
@@ -16,4 +16,5 @@ __all__ = [
     "ClusterAssignmentEmbedder",
     "EnergyStatistics",
     "ConfigExtractor",
+    "validate_configurations",
 ]
