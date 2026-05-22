@@ -4,7 +4,7 @@ title: "MixConfig: Mixing Configurations for Downstream Prediction"
 type: software
 license: MIT
 repository-code: "https://github.com/Q9gJYx/MixConfig"
-url: "https://openreview.net/forum?id=MomisBwZhT"
+url: "https://openreview.net/forum?id=aw6alulxr8"
 abstract: >-
   MixConfig is a plug-and-play feature augmentation module that extracts
   structurally stable clustering configurations from a frozen embedding and

@@ -1,8 +1,8 @@
 # MixConfig: Mixing Configurations for Downstream Prediction
 
-[![ICML 2026](https://img.shields.io/badge/ICML-2026-1d4ed8.svg)](https://openreview.net/forum?id=MomisBwZhT)
+[![ICML 2026](https://img.shields.io/badge/ICML-2026-1d4ed8.svg)](https://icml.cc/virtual/2026/poster/63010)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.19248-b31b1b.svg)](https://arxiv.org/abs/2510.19248)
-[![OpenReview](https://img.shields.io/badge/OpenReview-MomisBwZhT-8c1b13.svg)](https://openreview.net/forum?id=MomisBwZhT)
+[![OpenReview](https://img.shields.io/badge/OpenReview-aw6alulxr8-8c1b13.svg)](https://openreview.net/forum?id=aw6alulxr8)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org)
@@ -74,7 +74,7 @@ MixConfig improves downstream prediction across four modalities relative to sing
 | Molecular | MolHIV, BBBP, BACE, QM9 | GNN, MLP on Morgan + GIN features |
 | Text | SST-2, AG News | Linear probe on BERT, RoBERTa |
 
-Gains are most pronounced in low-data regimes; see `experiments/run_lowdata.py` for the BBBP 5-fold CV protocol. Full numerical results and ablations are in the [camera-ready paper](https://openreview.net/forum?id=MomisBwZhT) (Tables 1 to 4).
+Gains are most pronounced in low-data regimes; see `experiments/run_lowdata.py` for the BBBP 5-fold CV protocol. Full numerical results and ablations are in the camera-ready paper ([ICML poster page](https://icml.cc/virtual/2026/poster/63010), [OpenReview](https://openreview.net/forum?id=aw6alulxr8), Tables 1 to 4).
 
 ## 🔁 Reproducing Paper Results
 
