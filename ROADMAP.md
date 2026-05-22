@@ -4,8 +4,8 @@ This file tracks planned releases beyond the ICML 2026 camera-ready snapshot (`v
 
 ## v1.1 (target: post-conference, July 2026)
 
-- **MNIST-70k pre-extracted artifacts.** Ship `data/mnist_70k_configs.npz` (full 70 000-sample MNIST with HOG features), a larger-scale companion to the MNIST-5000 reference demo released in v1.0.
 - **Pre-extracted artifacts for additional benchmarks.** OpenML-CC18, BBBP, SST-2.
+- **Alternative feature embeddings for MNIST.** Pre-extracted energy statistics with CLIP and raw-pixel features alongside the current HOG-based artifact.
 - **Reproducibility hardening.** Exact-version `environment.lock.yml` exported from the validated tag environment; per-script seed and runtime annotations.
 
 ## v1.2 (target: late 2026)

@@ -26,7 +26,7 @@ Researchers interested in early access for academic collaboration are welcome to
 
 Even without the extractor code, we want readers and reviewers to be able to exercise the MixConfig pipeline end-to-end. To that end:
 
-- **Pre-extracted configurations and energy statistics** for the MNIST-5000 reference demo are released at `data/mnist5k_configs.npz`. These are *outputs* of running our Python port on public data, with no IP overlap with the upstream algorithm code. A larger MNIST-70k variant is planned for v1.1.
+- **Pre-extracted configurations and energy statistics** for the MNIST-70k reference demo are released at `data/mnist_configs.npz` (~408 KB). Configurations come from the BlueRed front; energy statistics (H, h_a, h_r, delta_gamma) are computed on HOG features by `scripts/extract_mnist_artifacts.py`, matching the schema in `src/mixconfig/energy.py`. These are *outputs* of running our Python port on public data, with no IP overlap with the upstream algorithm code.
 - **An interface contract** (`docs/configurations.md`) documents the exact `.npy` / `.npz` array shapes and semantics, so that any user with their own multi-resolution clustering routine can substitute it for our extractor.
 - **Pre-extracted artifacts for additional benchmarks** (OpenML-CC18, BBBP, SST-2) are tracked in [ROADMAP.md](../ROADMAP.md) and will land in subsequent releases.
 
@@ -37,5 +37,5 @@ Even without the extractor code, we want readers and reviewers to be able to exe
 | Parallel-DT algorithm description | Liu / Floros / Pitsianis / Sun (HPEC 2021, 2023) | Published in HPEC proceedings | IEEE proceedings |
 | Up-to-date reference implementation | Pitsianis et al. | Under journal review, not public | TBD by upstream |
 | Python port (`bluered`) | MixConfig authors | Private development repo, v0.1.0 | TBD |
-| Pre-extracted configurations (MNIST-5000) | MixConfig authors | Released here, see `data/mnist5k_configs.npz` (v1.0.0); MNIST-70k planned for v1.1 | MIT (this repo) |
+| Pre-extracted configurations + energy statistics (MNIST-70k) | MixConfig authors | Released here, see `data/mnist_configs.npz` (v1.0.0) | MIT (this repo) |
 | MixConfig selector + predictors | MixConfig authors | Released here, see `src/` | MIT (this repo) |
