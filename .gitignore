@@ -25,12 +25,18 @@ venv/
 env/
 
 # Data and outputs
-data/
+data/*
+!data/.gitkeep
+!data/README.md
+!data/*.npz
 logs/
 results/
 outputs/
 checkpoints/
 wandb/
+
+# Agent scratch
+.claude/
 
 # Model artifacts
 *.pt
