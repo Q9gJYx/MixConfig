@@ -1,4 +1,4 @@
-# MixConfig: Mixing Configurations for Downstream Prediction
+# [ICML 2026] MixConfig: Mixing Configurations for Downstream Prediction
 
 [![ICML 2026](https://img.shields.io/badge/ICML-2026-1d4ed8.svg)](https://icml.cc/virtual/2026/poster/63010)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.19248-b31b1b.svg)](https://arxiv.org/abs/2510.19248)
