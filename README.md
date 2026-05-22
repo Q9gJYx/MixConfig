@@ -117,7 +117,7 @@ python experiments/run_ablation.py --dataset bbbp --ablation full
 
 ### Pre-extracted artifacts
 
-For end-to-end runs without the external configuration extractor, we ship pre-extracted configurations and energy statistics under `data/` (see roadmap below for full benchmark coverage). MNIST is included as the reference demo. See `docs/configurations.md` for the file format and substitution interface.
+For end-to-end runs without the external configuration extractor, pre-extracted configurations and energy statistics are released under `data/` (see [ROADMAP.md](ROADMAP.md) for current contents and full benchmark coverage). The MNIST-5000 subset with HOG features is the reference demo. See `docs/configurations.md` for the file format and substitution interface.
 
 ## 🧩 Repository Structure
 
@@ -147,13 +147,13 @@ MixConfig/
 
 ## 🔗 Dependencies and Attribution
 
-Configuration extraction uses the **Parallel-DT algorithm** with the **BlueRed front** of [Liu, Floros, Pitsianis, and Sun (HPEC 2021)](https://doi.org/10.1109/HPEC49654.2021.9622834) and [Pitsianis, Floros, Liu, and Sun (HPEC 2023)](https://doi.org/10.1109/HPEC58863.2023.10363552). An updated reference implementation is under journal review by the upstream group. We ship pre-extracted configurations and energy statistics in `data/` so the MixConfig pipeline can be reproduced end-to-end; an interface contract for substituting your own multi-resolution clustering routine is documented in `docs/configurations.md`. See `docs/dependencies.md` for full status of the extractor code.
+Configuration extraction uses the **Parallel-DT algorithm** with the **BlueRed front** of [Liu, Floros, Pitsianis, and Sun (HPEC 2021)](https://doi.org/10.1109/HPEC49654.2021.9622834) and [Pitsianis, Floros, Liu, and Sun (HPEC 2023)](https://doi.org/10.1109/HPEC58863.2023.10363552). An updated reference implementation is under journal review by the upstream group. To support end-to-end reproduction without the extractor, pre-extracted configurations and energy statistics for the MNIST-5000 reference demo are released under `data/`; an interface contract for substituting your own multi-resolution clustering routine is documented in `docs/configurations.md`. See `docs/dependencies.md` for full status of the extractor code.
 
 ## 🗺️ Roadmap
 
 - Public release of our Python port of Parallel-DT / BlueRed, pending parity with the upstream journal version and coordination with the original authors.
 - QM9 molecular pipeline and pre-extracted configurations for the remaining benchmarks.
-- Minimal MNIST demo notebook that loads `data/mnist_70k_configs.npz` and runs the selector end-to-end.
+- Colab-runnable demo notebook that loads `data/mnist5k_configs.npz` and runs the selector end-to-end.
 
 See [ROADMAP.md](ROADMAP.md) for the full plan and tracking issues.
 

@@ -5,8 +5,8 @@ This module defines the interface for configuration extraction. The Parallel-DT
 algorithm with the BlueRed front (Liu et al., HPEC 2021; Pitsianis et al., HPEC
 2023) is the upstream backend; see docs/dependencies.md for full attribution
 and release status. Pre-extracted configurations and energy statistics are
-shipped under data/; the file-format contract is documented in
-docs/configurations.md.
+provided under data/ (see data/README.md for current contents and roadmap);
+the file-format contract is documented in docs/configurations.md.
 """
 
 from typing import Tuple, Optional, Dict
@@ -36,6 +36,11 @@ def validate_configurations(
     if energy_stats.ndim != 2 or energy_stats.shape[1] != 4:
         raise ValueError(
             f"energy_stats must be 2-D [n_configs, 4], got shape {energy_stats.shape}. "
+            "See docs/configurations.md."
+        )
+    if not np.issubdtype(energy_stats.dtype, np.floating):
+        raise ValueError(
+            f"energy_stats must be a floating-point dtype, got {energy_stats.dtype}. "
             "See docs/configurations.md."
         )
     if energy_stats.shape[0] != configs.shape[1]:

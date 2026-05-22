@@ -43,8 +43,8 @@ configs      = np.load("configs.npy")                          # [n, m] int64
 energy_stats = np.load("energy_stats.npy")                     # [m, 4] float32
 energy_stats_t = torch.tensor(energy_stats, dtype=torch.float32)
 
-# Bundled form
-bundle = np.load("data/mnist_70k_configs.npz")
+# Bundled form (MNIST-5000 reference demo shipped with v1.0.0)
+bundle = np.load("data/mnist5k_configs.npz")
 configs, energy_stats = bundle["configs"], bundle["energy_stats"]
 energy_stats_t = torch.tensor(energy_stats, dtype=torch.float32)
 ```

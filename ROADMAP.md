@@ -4,8 +4,7 @@ This file tracks planned releases beyond the ICML 2026 camera-ready snapshot (`v
 
 ## v1.1 (target: post-conference, July 2026)
 
-- **Pre-extracted MNIST artifacts.** Ship `data/mnist_70k_configs.npz` containing configurations and energy statistics from our Python port of Parallel-DT / BlueRed, enabling end-to-end MixConfig reproduction without the extractor.
-- **MNIST demo notebook.** `notebooks/demo_mnist.ipynb` that loads the .npz artifacts and runs the Energy-Aware Selector end-to-end.
+- **MNIST-70k pre-extracted artifacts.** Ship `data/mnist_70k_configs.npz` (full 70 000-sample MNIST with HOG features), a larger-scale companion to the MNIST-5000 reference demo released in v1.0.
 - **Pre-extracted artifacts for additional benchmarks.** OpenML-CC18, BBBP, SST-2.
 - **Reproducibility hardening.** Exact-version `environment.lock.yml` exported from the validated tag environment; per-script seed and runtime annotations.
 
